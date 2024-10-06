@@ -1,10 +1,11 @@
 var webSocket = new WebSocket("ws://localhost:8888/")
-var conneted = false;
+var isConneted = false;
+var isProcessing = false;
 const CHUNK_SIZE = 1024;
 
 webSocket.onopen = function(event) {
     console.log('Client connects to server via websocket.');
-    conneted = true;
+    isConneted = true;
 };
 
 webSocket.onclose = function(event) {
@@ -16,22 +17,24 @@ webSocket.onclose = function(event) {
     }
 
     console.error(errorMessage);
-    conneted = false;
+    isConneted = false;
 };
 
 webSocket.onmessage = function(event) {
     loadOutputImg(event.data);
+    isProcessing = false;
 }
   
 webSocket.onerror = function(error) {
     console.error(`Websocket error: ${error}`);
-    conneted = false;
+    isConneted = false;
 };
 
 document.getElementById("img-form").addEventListener("submit", function(event) {
     event.preventDefault();
-    if(conneted)
+    if(isConneted && !isProcessing)
     {
+        output("")
         let fileInput = document.getElementById('file-input');
         let imageBox = document.getElementById('image-box');
         let file = fileInput.files[0];
@@ -48,6 +51,7 @@ document.getElementById("img-form").addEventListener("submit", function(event) {
             if (event.target.readyState === FileReader.DONE) {
                 const bytes = new Uint8Array(event.target.result);
                 webSocket.send(bytes);
+                isProcessing = true;
             }
         };  
         reader.readAsArrayBuffer(file);
@@ -55,9 +59,13 @@ document.getElementById("img-form").addEventListener("submit", function(event) {
         outputImageBox(imageBox);
         loadInputImg(file)
     }
-    else
+    else if (!isConneted)
     {
         output("No connection with websocket. Try again later.")
+    }
+    else
+    {
+        output("The image is being processed, please wait.")
     }
 });
 
