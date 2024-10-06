@@ -1,34 +1,39 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>CANNY-WEB-SOCKET</title>
-        <link rel="icon" href="icon.ico" type="image/x-icon">
-        <link rel="stylesheet" href="styles.css">
-        <script defer src="fileInput.js"></script>
-        <script defer src="client.js"></script>
-    </head>
-    <body>
-        <header>
-            <div class="header-background">
-                <p>
-                    <label class="title">Курсовая работа по РИС</label>
-                </p>
-                <p>
-                    <label class="author">@Гайшун И.А. ИТИ-41</label>
-                </p>
-            </div>
-        </header>
-        <div class="inline-black"></div>
-        <br/>
-        <main>
+
+<head>
+    <title>CANNY-WEB-SOCKET</title>
+    <link rel="icon" href="icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="fileInput.js"></script>
+    <script defer src="client.js"></script>
+    <script defer src="viewImage.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-background">
             <p>
-                <label>
-                    <b>Оператор Кэнни</b> (детектор границ Кэнни, алгоритм Кэнни) в дисциплине компьютерного зрения — оператор обнаружения границ изображения. 
-                    Был разработан в 1986 году Джоном Кэнни (англ. John F. Canny) и использует многоступенчатый алгоритм для обнаружения широкого спектра границ в изображениях.
-                </label>
+                <label class="title">Курсовая работа по РИС</label>
             </p>
-            <br/>
             <p>
+                <label class="author">@Гайшун И.А. ИТИ-41</label>
+            </p>
+        </div>
+    </header>
+    <div class="inline-black"></div>
+    <br />
+    <main>
+        <p>
+            <label>
+                <b>Оператор Кэнни</b> (детектор границ Кэнни, алгоритм Кэнни) в дисциплине компьютерного зрения —
+                оператор обнаружения границ изображения.
+                Был разработан в 1986 году Джоном Кэнни (англ. John F. Canny) и использует многоступенчатый алгоритм для
+                обнаружения широкого спектра границ в изображениях.
+            </label>
+        </p>
+        <br />
+        <p>
             <label>
                 Целью Кэнни было разработать оптимальный алгоритм обнаружения границ, удовлетворяющий трём критериям:
                 <p>
@@ -41,25 +46,34 @@
                     - единственный отклик на одну границу.
                 </p>
             </label>
-            </p>
-            <br/>
-            <div class="input-form">
-               <form id="img-form" type="post" enctype="multipart/form-data">
-                    <label class="input-file">
-                        <span class="input-file-btn">Выберите файл</span>
-                        <input id="file-input" type="file" name="file">  
-                        <span class="input-file-text" type="text"></span>      
-                    </label>
-                    <br><button id="send" class="button-send">Отправить</button>
-                </form>
-            </div>
-            <br/>
-            <div class="inline"></div>
-            <br/>
+        </p>
+        <br />
+        <div class="input-form">
+            <form id="img-form" type="post" enctype="multipart/form-data">
+                <label class="input-file">
+                    <span class="input-file-btn">Выберите файл</span>
+                    <input id="file-input" type="file" name="file" accept="image/png, image/jpeg, image/jpg">
+                    <span class="input-file-text" type="text"></span>
+                </label>
+                <br><button id="send" class="button-send">Отправить</button>
+            </form>
+        </div>
+        <br />
+        <div class="inline"></div>
+        <br />
+        <p>
             <label id="error"></label>
-            <br/>
-            <div id="image-box"> 
-            </div>
-        </main>
-    </body>
+        </p>
+        <br />
+        <div id="otchet">
+           
+        </div>
+        <br/>
+        <div id="image-box">
+        </div>
+        <div id="big-image" onclick="closeImg()">
+        </div>
+    </main>
+</body>
+
 </html>

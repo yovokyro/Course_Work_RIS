@@ -1,14 +1,21 @@
 var webSocket = new WebSocket("ws://localhost:8888/")
 var isConneted = false;
 var isProcessing = false;
+
+var start_time = 0;
+var result_time = 0;
+
 const CHUNK_SIZE = 1024;
 
-webSocket.onopen = function(event) {
+
+//Ивенты сокеты
+
+webSocket.onopen = function (event) {
     console.log('Client connects to server via websocket.');
     isConneted = true;
 };
 
-webSocket.onclose = function(event) {
+webSocket.onclose = function (event) {
     let errorMessage;
     if (event.wasClean) {
         errorMessage = `Connection closed, code=${event.code} couse=${event.reason}.`;
@@ -16,84 +23,183 @@ webSocket.onclose = function(event) {
         errorMessage = 'Connection interrupted.';
     }
 
+    if(isProcessing)
+    {
+        setStatus(-1);  
+        isProcessing = false;
+    }
     console.error(errorMessage);
     isConneted = false;
 };
 
-webSocket.onmessage = function(event) {
-    loadOutputImg(event.data);
+webSocket.onmessage = function (event) {
+    try
+    {
+        console.log("DONE")
+        const packet = JSON.parse(event.data);
+        const image = packet.image;
+        const server_time = parseFloat(packet.time);
+
+        const binaryString = window.atob(image);
+        const uintArray = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            uintArray[i] = binaryString.charCodeAt(i);
+        }
+
+        const blob = new Blob([uintArray], { type: 'image/png' });
+
+        loadImage(blob, 'image-output');
+        setStatus(1);
+    
+        const result_time = performance.now() - start_time;
+        setTime(result_time, 'otchet-time-client');
+        setTime(server_time, 'otchet-time-server');
+
+    } catch(error) {
+        console.error(error);
+        setStatus(-1);
+    }
+    
     isProcessing = false;
 }
-  
-webSocket.onerror = function(error) {
+
+webSocket.onerror = function (error) {
     console.error(`Websocket error: ${error}`);
+    if(isProcessing)
+    {
+        setStatus(-1);  
+        isProcessing = false;
+    }
+    
     isConneted = false;
 };
 
-document.getElementById("img-form").addEventListener("submit", function(event) {
+//Отправка данных
+
+document.getElementById("img-form").addEventListener("submit", function (event) {
     event.preventDefault();
-    if(isConneted && !isProcessing)
-    {
-        output("")
-        let fileInput = document.getElementById('file-input');
-        let imageBox = document.getElementById('image-box');
-        let file = fileInput.files[0];
 
-        if (!file) {
-            let errorMessage = 'File not selected or file is null.';
-            console.error(errorMessage);
-            output(errorMessage);
-            return;
-        }
-        const reader = new FileReader();
-    
-        reader.onload = function(event) {
-            if (event.target.readyState === FileReader.DONE) {
-                const bytes = new Uint8Array(event.target.result);
-                webSocket.send(bytes);
-                isProcessing = true;
-            }
-        };  
-        reader.readAsArrayBuffer(file);
+    if (!isConneted) {
+        outputError("No connection with websocket. Try again later.");
+        return;
+    }
 
-        outputImageBox(imageBox);
-        loadInputImg(file)
+    if (isProcessing) {
+        outputError("The image is being processed, please wait.");
+        return;
     }
-    else if (!isConneted)
-    {
-        output("No connection with websocket. Try again later.")
+
+    const fileInput = document.getElementById('file-input');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        const errorMessage = 'File not selected or file is null.';
+        console.error(errorMessage);
+        outputError(errorMessage);
+        return;
     }
-    else
-    {
-        output("The image is being processed, please wait.")
-    }
+
+    isProcessing = true;
+
+    outputError("");
+    createUI();
+    setStatus(0);
+    loadImage(file, 'image-input');
+    sendFileChunks(file);
 });
 
-function output(message) {
-    let error = document.getElementById('error');
+async function sendFileChunks(file) {
+    start_time = performance.now()
+
+    const fileArrayBuffer = await file.arrayBuffer();
+    const totalSize = fileArrayBuffer.byteLength;
+    let offset = 0;
+
+    while (offset < totalSize) {
+        const chunk = fileArrayBuffer.slice(offset, offset + CHUNK_SIZE);
+        webSocket.send(chunk);
+        offset += CHUNK_SIZE;
+    }
+
+    webSocket.send(new TextEncoder().encode('EOF'));
+}
+
+//Работа с интерфейсом
+
+function outputError(message) {
+    const error = document.getElementById('error');
     error.textContent = message
 }
 
-function outputImageBox(imageBox) {
-    imageBox.innerHTML = '<div><label>Input:</label><img id="image-input" alt="Loading..."/></div><div><label>Output:</label><img id="image-output" alt="Loading..."/></div>';
+function createUI() {
+    const imageBox = document.getElementById('image-box');
+    const otchet = document.getElementById('otchet')
+
+    if(imageBox)
+    {
+        imageBox.innerHTML = '<div><label>Input:</label><img id="image-input" onclick="openImg(this)" alt="Loading..."/></div><div><label>Output:</label><img id="image-output" onclick="openImg(this)" alt="Loading..."/></div>';
+    }
+
+    if(otchet)
+    {
+        otchet.innerHTML = '<p><label><b>ОТЧЕТ</b> </label></p>' +
+            '<p><label>Статус: <label id="otchet-status"></label></label></p>' +
+            '<p><label>Количество потоков: <label id="otchet-threads">-</label></label></p>' +
+            '<p><label>Время обработки изображения: <label id="otchet-time-server">-</label></label></p>' +
+            '<p><label>Общее время: <label id="otchet-time-client">-</label></label></p>'
+    }
 }
 
-function loadInputImg(img) {
-    let image = document.getElementById('image-input');
-    var imageUrl = URL.createObjectURL(img);
-    
-    if(image)
-    {
+function loadImage(img, elementId) {
+    const image = document.getElementById(elementId);
+    if (image) {
+        const imageUrl = URL.createObjectURL(img);
         image.src = imageUrl;
     }
 }
 
-function loadOutputImg(img) {
-    let image = document.getElementById('image-output');
-    var imageUrl = URL.createObjectURL(img);
+//Методы установки данных в отчет
 
-    if(image)
+function setStatus(code) {
+    const status = document.getElementById('otchet-status')
+
+    if(status)
     {
-        image.src = imageUrl;
+        switch (code) {
+            case 0:
+                status.innerText = "Ожидание...";
+                status.style.color = "orange";
+                break;
+            case 1:
+                status.innerText = "Готово!";
+                status.style.color = "green";
+                break;
+            case -1:
+                status.innerText = "Прервано.";
+                status.style.color = "red";
+                break;
+            default:
+                status.innerText = "-";
+                status.style.color = "black";
+        }
+    }
+}
+
+function setTime(time, elementId) {
+    const timeClient = document.getElementById(elementId)
+
+    if(timeClient)
+    {
+        timeClient.innerText = getFormatTimeToString(time)
+    }
+}
+
+function getFormatTimeToString(time) {
+    if (time < 1000) {
+        return time.toFixed(2) + ' мс.';
+    } else if (time < 60000) {
+        return (time / 1000).toFixed(2) + ' сек.';
+    } else {
+        return (time / 60000).toFixed(2) + ' мин.';
     }
 }
