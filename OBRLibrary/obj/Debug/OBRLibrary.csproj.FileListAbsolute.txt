@@ -1,0 +1,15 @@
+E:\Course_Work_RIS\OBRLibrary\obj\Debug\OBRLibrary.csproj.AssemblyReference.cache
+E:\Course_Work_RIS\OBRLibrary\obj\Debug\OBRLibrary.csproj.CoreCompileInputs.cache
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\OBRLibrary.dll
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\OBRLibrary.pdb
+E:\Course_Work_RIS\OBRLibrary\obj\Debug\OBRLibrary.dll
+E:\Course_Work_RIS\OBRLibrary\obj\Debug\OBRLibrary.pdb
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Buffers.dll
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Memory.dll
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Numerics.Vectors.dll
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Buffers.xml
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Memory.xml
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Numerics.Vectors.xml
+E:\Course_Work_RIS\OBRLibrary\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+E:\Course_Work_RIS\OBRLibrary\obj\Debug\OBRLibrary.csproj.Up2Date

@@ -1,4 +1,7 @@
+//var webSocket = new WebSocket("ws://127.0.0.1/")
+
 var webSocket = new WebSocket("ws://localhost:8888/")
+
 var isConneted = false;
 var isProcessing = false;
 
@@ -28,6 +31,8 @@ webSocket.onclose = function (event) {
         setStatus(-1);  
         isProcessing = false;
     }
+
+    outputError(errorMessage);
     console.error(errorMessage);
     isConneted = false;
 };
@@ -35,7 +40,6 @@ webSocket.onclose = function (event) {
 webSocket.onmessage = function (event) {
     try
     {
-        console.log("DONE")
         const packet = JSON.parse(event.data);
         const image = packet.image;
         const server_time = parseFloat(packet.time);
@@ -112,16 +116,16 @@ async function sendFileChunks(file) {
     start_time = performance.now()
 
     const fileArrayBuffer = await file.arrayBuffer();
-    const totalSize = fileArrayBuffer.byteLength;
+    const totalSize = new Uint32Array(1);
+    totalSize[0] = fileArrayBuffer.byteLength;
     let offset = 0;
 
-    while (offset < totalSize) {
+    webSocket.send(totalSize);
+    while (offset < totalSize[0]) {
         const chunk = fileArrayBuffer.slice(offset, offset + CHUNK_SIZE);
         webSocket.send(chunk);
         offset += CHUNK_SIZE;
     }
-
-    webSocket.send(new TextEncoder().encode('EOF'));
 }
 
 //Работа с интерфейсом
