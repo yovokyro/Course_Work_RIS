@@ -1,0 +1,13 @@
+E:\Course_Work_RIS\ClientEmulator\bin\Debug\ClientEmulator.exe.config
+E:\Course_Work_RIS\ClientEmulator\bin\Debug\ClientEmulator.exe
+E:\Course_Work_RIS\ClientEmulator\bin\Debug\ClientEmulator.pdb
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEmulator.csproj.AssemblyReference.cache
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEmulator.Emulator.resources
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEmulator.Properties.Resources.resources
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEmulator.csproj.GenerateResource.cache
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEmulator.csproj.CoreCompileInputs.cache
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEmulator.exe
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEmulator.pdb
+E:\Course_Work_RIS\ClientEmulator\bin\Debug\Newtonsoft.Json.dll
+E:\Course_Work_RIS\ClientEmulator\bin\Debug\Newtonsoft.Json.xml
+E:\Course_Work_RIS\ClientEmulator\obj\Debug\ClientEm.32E02A3F.Up2Date
