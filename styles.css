@@ -161,3 +161,7 @@ main {
     max-height: 90vh;
     object-fit: contain;
 }
+
+.margin-top {
+    margin: 20px 20px 0 0;
+}

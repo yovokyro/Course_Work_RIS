@@ -1,6 +1,6 @@
 //var webSocket = new WebSocket("ws://127.0.0.1/")
 
-var webSocket = new WebSocket("ws://localhost:8888/")
+var webSocket = new WebSocket("ws://192.168.100.14:8888/")
 
 var isConneted = false;
 var isProcessing = false;
@@ -8,8 +8,9 @@ var isProcessing = false;
 var start_time = 0;
 var result_time = 0;
 
-const CHUNK_SIZE = 1024;
+var thread = false;
 
+const CHUNK_SIZE = 1024;
 
 //Ивенты сокеты
 
@@ -58,6 +59,7 @@ webSocket.onmessage = function (event) {
         const result_time = performance.now() - start_time;
         setTime(result_time, 'otchet-time-client');
         setTime(server_time, 'otchet-time-server');
+        getThread('otchet-thread')
 
     } catch(error) {
         console.error(error);
@@ -96,6 +98,8 @@ document.getElementById("img-form").addEventListener("submit", function (event) 
     const fileInput = document.getElementById('file-input');
     const file = fileInput.files[0];
 
+    thread = document.getElementById('thread').checked;
+
     if (!file) {
         const errorMessage = 'File not selected or file is null.';
         console.error(errorMessage);
@@ -120,7 +124,15 @@ async function sendFileChunks(file) {
     totalSize[0] = fileArrayBuffer.byteLength;
     let offset = 0;
 
-    webSocket.send(totalSize);
+    const checkBoxValue = thread ? 1 : 0;
+    const dataBuffer = new ArrayBuffer(5); 
+    const dataView = new DataView(dataBuffer);
+    
+    dataView.setUint32(0, totalSize[0], true);
+    dataView.setUint8(4, checkBoxValue);
+
+    webSocket.send(dataBuffer);
+
     while (offset < totalSize[0]) {
         const chunk = fileArrayBuffer.slice(offset, offset + CHUNK_SIZE);
         webSocket.send(chunk);
@@ -148,7 +160,7 @@ function createUI() {
     {
         otchet.innerHTML = '<p><label><b>ОТЧЕТ</b> </label></p>' +
             '<p><label>Статус: <label id="otchet-status"></label></label></p>' +
-            '<p><label>Количество потоков: <label id="otchet-threads">-</label></label></p>' +
+            '<p><label>Режим: <label id="otchet-thread">-</label></label></p>' +
             '<p><label>Время обработки изображения: <label id="otchet-time-server">-</label></label></p>' +
             '<p><label>Общее время: <label id="otchet-time-client">-</label></label></p>'
     }
@@ -204,6 +216,18 @@ function getFormatTimeToString(time) {
     } else if (time < 60000) {
         return (time / 1000).toFixed(2) + ' сек.';
     } else {
-        return (time / 60000).toFixed(2) + ' мин.';
+        var minutes = Math.floor(time / 60000);
+        var seconds = Math.floor((time % 60000) / 1000);
+        seconds = (seconds < 10) ? '0' + seconds : seconds;
+        return minutes + ':' + seconds + ' мин.';
+    }
+}
+
+function getThread(elementId) {
+    const threadElement = document.getElementById(elementId)
+
+    if(threadElement)
+    {
+        threadElement.innerText = thread ? "Многопоточное выполнение" : "Однопоточное выполнение"
     }
 }
